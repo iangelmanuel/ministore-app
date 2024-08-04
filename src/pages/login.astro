@@ -96,7 +96,6 @@ import AuthLayout from "@/layouts/AuthLayout.astro"
 </AuthLayout>
 
 <script>
-  import { actions } from "astro:actions"
   import Swal from "sweetalert2"
 
   const form = document.querySelector("form") as HTMLFormElement
@@ -111,7 +110,6 @@ import AuthLayout from "@/layouts/AuthLayout.astro"
 
     const formData = new FormData(form)
 
-    // const { error } = await actions.loginUser(formData)
     const res = await signIn("credentials", {
       email: formData.get("email"),
       password: formData.get("password"),
