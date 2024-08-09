@@ -1,0 +1,12 @@
+---
+import MainLayout from "@/layouts/MainLayout.astro"
+import { actions } from "astro:actions"
+
+const { data: products, error } = await actions.loadProductCart()
+---
+
+<MainLayout title="Cart">
+  <h1>Cart</h1>
+
+  <code>{JSON.stringify(products)}</code>
+</MainLayout>
