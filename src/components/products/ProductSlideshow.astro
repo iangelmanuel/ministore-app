@@ -46,10 +46,14 @@ const fullImages = images.map((image) => {
   import Swiper from "swiper"
   import { Pagination } from "swiper/modules"
 
-  const swiper = new Swiper(".swiper", {
-    pagination: {
-      el: ".swiper-pagination"
-    },
-    modules: [Pagination]
+  document.addEventListener("astro:page-load", () => {
+    new Swiper(".swiper", {
+      loop: true,
+      pagination: {
+        el: ".swiper-pagination",
+        clickable: true
+      },
+      modules: [Pagination]
+    })
   })
 </script>
