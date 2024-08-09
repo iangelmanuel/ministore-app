@@ -5,7 +5,7 @@ import ProductSlideshow from "@/components/products/ProductSlideshow.astro"
 
 const { slug } = Astro.params
 
-const { data, error } = await actions.getProductBySlug(slug ?? "")
+const { data, error } = await actions.getProductBySlug.safe(slug ?? "")
 
 if (error !== undefined) {
   return Astro.redirect("/404")
@@ -63,55 +63,61 @@ const { product, images } = data
 </MainLayout>
 
 <script>
+  import { itemsInCart } from "@/store/cart.store"
   import { CartCookiesClient } from "@/utils/cart-cookies"
+  import { navigate } from "astro:transitions/client"
 
-  const sizeElement = document.querySelectorAll("li")
-  sizeElement.forEach((liElement) => {
-    liElement.addEventListener("click", () => {
-      sizeElement.forEach((el) => el.classList.remove("selected-size"))
-      liElement.classList.add("selected-size")
+  document.addEventListener("astro:page-load", () => {
+    const sizeElement = document.querySelectorAll("li")
+
+    sizeElement.forEach((liElement) => {
+      liElement.addEventListener("click", () => {
+        sizeElement.forEach((el) => el.classList.remove("selected-size"))
+        liElement.classList.add("selected-size")
+      })
     })
-  })
 
-  const quantityInput = document.querySelector("input") as HTMLInputElement
-  const productIdInput = document.querySelector(
-    "#product-id"
-  ) as HTMLInputElement
+    const quantityInput = document.querySelector("input") as HTMLInputElement
+    const productIdInput = document.querySelector(
+      "#product-id"
+    ) as HTMLInputElement
 
-  let quantity = 1
+    let quantity = 1
 
-  const [decrementBtn, incrementBtn, addToCardBtn] = document.querySelectorAll(
-    "button"
-  ) as NodeListOf<HTMLButtonElement>
+    const [decrementBtn, incrementBtn, addToCardBtn] =
+      document.querySelectorAll("button") as NodeListOf<HTMLButtonElement>
 
-  decrementBtn.addEventListener("click", () => {
-    quantity = Math.max(quantity - 1, 1)
-    quantityInput.value = quantity.toString()
-  })
+    if (!incrementBtn || !quantityInput) return
 
-  incrementBtn.addEventListener("click", () => {
-    quantity = Math.min(quantity + 1, 5)
-    quantityInput.value = quantity.toString()
-  })
+    decrementBtn.addEventListener("click", () => {
+      quantity = Math.max(quantity - 1, 1)
+      quantityInput.value = quantity.toString()
+    })
 
-  addToCardBtn.addEventListener("click", () => {
-    const size = document.querySelector(".selected-size")?.textContent
-    const productId = productIdInput.value
+    incrementBtn.addEventListener("click", () => {
+      quantity = Math.min(quantity + 1, 5)
+      quantityInput.value = quantity.toString()
+    })
 
-    if (size === undefined || size === null) {
-      return alert("Selecciona una talla")
-    }
+    addToCardBtn.addEventListener("click", async () => {
+      const size = document.querySelector(".selected-size")?.textContent
+      const productId = productIdInput.value
 
-    addToCardBtn.disabled = true
+      if (size === undefined || size === null) {
+        return alert("Selecciona una talla")
+      }
 
-    const data = {
-      id: productId,
-      size,
-      quantity
-    }
+      addToCardBtn.disabled = true
 
-    CartCookiesClient.addItem(data)
-    window.location.href = "/cart"
+      const cart = CartCookiesClient.addItem({
+        id: productId,
+        size,
+        quantity
+      })
+
+      itemsInCart.set(cart.length)
+      await navigate("/cart")
+    })
   })
 </script>
 
