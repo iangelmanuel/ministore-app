@@ -1,5 +1,5 @@
 import type { CartItem } from "@/interfaces/cart-item"
-import { defineAction } from "astro:actions"
+import { defineAction, z } from "astro:actions"
 import { db, eq, inArray, Product, ProductImage } from "astro:db"
 
 export const loadProductCart = defineAction({
@@ -7,8 +7,6 @@ export const loadProductCart = defineAction({
   // input: z.string(),
   handler: async (_, { cookies }) => {
     const cart = JSON.parse(cookies.get("cart")?.value ?? "[]") as CartItem[]
-    console.log("cart", cart)
-
     if (cart.length === 0) return []
 
     // Load products
