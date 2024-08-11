@@ -19,7 +19,7 @@ const { product, images } = data
   description={product.description}
 >
   <div class="grid grid-cols-1 md:grid-cols-3 w-full">
-    <ProductSlideshow images={images} />
+    <ProductSlideshow images={images.map((i) => i.url)} />
 
     <section>
       <h2 class="text-2xl font-bold">{product.title}</h2>
