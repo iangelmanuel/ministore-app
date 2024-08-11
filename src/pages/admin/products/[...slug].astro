@@ -267,6 +267,7 @@ const { product, images } = data
               type="file"
               accept="image/*"
               multiple
+              class="hidden"
             />
           </label>
         </div>
@@ -330,8 +331,6 @@ const { product, images } = data
     const form = document.querySelector("form") as HTMLFormElement
     const sizeButtons = document.querySelectorAll(".btn-size")
 
-    console.log(sizeButtons)
-
     if (!form) return
 
     form.addEventListener("submit", async (e) => {
@@ -367,6 +366,68 @@ const { product, images } = data
         const trId = `${id}`
         document.querySelector(trId)?.remove()
       })
+    })
+
+    const lblSelectedFiles = document.querySelector(
+      "#lbl-selected-files"
+    ) as HTMLLabelElement
+    const dropZone = document.querySelector(
+      "#drop-zone"
+    ) as HTMLParagraphElement
+    const fileInput = document.querySelector("#file-upload") as HTMLInputElement
+
+    const preventDefaults = (e: DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+
+    const highlight = (e: DragEvent) => {
+      dropZone.classList.add("border-blue-500", "bg-blue-50")
+    }
+
+    const onHighlight = (e: DragEvent) => {
+      dropZone.classList.remove("border-blue-500", "bg-blue-50")
+    }
+
+    const createFileList = (files: File[]) => {
+      const dataTransfer = new DataTransfer()
+      files.forEach((file) => dataTransfer.items.add(file))
+      return dataTransfer.files
+    }
+
+    const handleFiles = (files: FileList) => {
+      const validFiles = Array.from(files).filter((file) =>
+        file.type.startsWith("image/")
+      )
+
+      if (fileInput && validFiles.length > 0) {
+        fileInput.files = createFileList(validFiles)
+      } else {
+        alert("Solo se permiten archivos de imagen")
+      }
+
+      lblSelectedFiles.textContent = `${validFiles.length} archivos seleccionados`
+    }
+
+    ;(["dragenter", "dragover", "dragleave", "drop"] as const).forEach(
+      (eventName) => {
+        dropZone.addEventListener(eventName, preventDefaults)
+        document.body.addEventListener(eventName, preventDefaults)
+      }
+    )
+    ;(["dragenter", "dragover"] as const).forEach((eventName) => {
+      dropZone.addEventListener(eventName, highlight)
+    })
+    ;(["dragleave", "drop"] as const).forEach((eventName) => {
+      dropZone.addEventListener(eventName, onHighlight)
+    })
+
+    dropZone.addEventListener("drop", (e) => {
+      const files = e.dataTransfer?.files
+
+      if (files) {
+        handleFiles(files)
+      }
     })
   })
 </script>
