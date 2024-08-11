@@ -26,7 +26,6 @@ select a.*,
 from ${Product} a
 LIMIT ${limit} OFFSET ${(page - 1) * limit};
 `
-
     // const products = await db
     //   .select()
     //   .from(Product)
@@ -34,10 +33,17 @@ LIMIT ${limit} OFFSET ${(page - 1) * limit};
     //   .limit(limit)
     //   .offset((page - 1) * 12)
 
-    const { rows: products } = await db.run(productsQuery)
+    const { rows } = await db.run(productsQuery)
+
+    const products = rows.map((product) => {
+      return {
+        ...product,
+        images: product.images ? product.images : "no-image.png"
+      }
+    }) as unknown as ProductWithImages[]
 
     return {
-      products: products as unknown as ProductWithImages[],
+      products,
       totalPages
     }
   }
