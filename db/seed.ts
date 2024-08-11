@@ -11,7 +11,7 @@ export default async function seed() {
   const hashedPassword = bcrypt.hashSync("123456", 10)
 
   const johnDoe = {
-    id: crypto.randomUUID(),
+    id: "abc-jane-doe",
     name: "Jane Doe",
     email: "jane.doe@google.com",
     password: hashedPassword,
@@ -19,7 +19,7 @@ export default async function seed() {
   }
 
   const janeDoe = {
-    id: crypto.randomUUID(),
+    id: "abc-john-doe",
     name: "John Doe",
     email: "john.doe@google.com",
     password: hashedPassword,
